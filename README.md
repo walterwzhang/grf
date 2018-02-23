@@ -17,9 +17,8 @@ This fork of the grf package is used for didatic purposes and will not be up to 
 To install the package run the following commands :
 
 ```R
-install.packages("devtools")
-library(devtools)
-install_github("walterwzhang/grf")
+install.packages("https://raw.github.com/walterwzhang/grf/master/releases/grf_0.9.5.tar.gz",
+                 repos = NULL, type = "source")
 ```
 
 Note that to install from source, a compiler that implements C++11 is required (clang 3.3 or higher, or g++ 4.8 or higher). If installing on Windows, the RTools toolchain is also required.
