@@ -28,19 +28,19 @@ Note that to install from source, a compiler that implements C++11 is required (
 ```R
 library(grf)
 
-# Generate data.
+# Generate data
+set.seed(12345)
 n   <-   2000
 p   <-   10
 X   <-   matrix(rnorm(n*p), n, p)
 X.test       <-   matrix(0, 101, p)
 X.test[,1]   <-   seq(-2, 2, length.out = 101)
-
-
-# Perform treatment effect estimation
 W   <-   rbinom(n, 1, 0.5)
 Y   <-   pmax(X[,1], 0) * W + X[,2] + pmin(X[,3], 0) + rnorm(n)
 
-tau.forest   <-   causal_forest(X, Y, W, num.trees = 1000)
+
+# Perform treatment effect estimation
+tau.forest   <-   causal_forest(X, Y, W, num.trees = 1000, seed = 1234)
 tau.hat      <-   predict(tau.forest, X.test)
 plot(x = X.test[,1],
      y = tau.hat$predictions,
