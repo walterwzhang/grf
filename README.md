@@ -38,10 +38,11 @@ X.test[,1]   <-   seq(-2, 2, length.out = 101)
 
 
 # Perform treatment effect estimation
-W = rbinom(n, 1, 0.5)
-Y = pmax(X[,1], 0) * W + X[,2] + pmin(X[,3], 0) + rnorm(n)
-tau.forest = causal_forest(X, Y, W)
-tau.hat = predict(tau.forest, X.test)
+W   <-   rbinom(n, 1, 0.5)
+Y   <-   pmax(X[,1], 0) * W + X[,2] + pmin(X[,3], 0) + rnorm(n)
+
+tau.forest   <-   causal_forest(X, Y, W, verbose = TRUE)
+tau.hat      <-   predict(tau.forest, X.test)
 plot(x = X.test[,1],
      y = tau.hat$predictions,
      ylim = range(tau.hat$predictions, 0, 2),
@@ -61,12 +62,13 @@ estimate_average_effect(tau.forest, target.sample = "treated")
 
 # Add confidence intervals for heterogeneous treatment effects
 ## Growing more trees is now recommended
-tau.forest = causal_forest(X, Y, W, num.trees = 4000)
-tau.hat = predict(tau.forest, X.test, estimate.variance = TRUE)
-sigma.hat = sqrt(tau.hat$variance.estimates)
+tau.forest   <-   causal_forest(X, Y, W, num.trees = 4000)
+tau.hat      <-   predict(tau.forest, X.test, estimate.variance = TRUE)
+sigma.hat    <-    sqrt(tau.hat$variance.estimates)
 plot(x = X.test[,1],
      y = tau.hat$predictions,
-     ylim = range(tau.hat$predictions + 1.96 * sigma.hat, tau.hat$predictions - 1.96 * sigma.hat, 0, 2),
+     ylim = range(tau.hat$predictions + 1.96 * sigma.hat,
+                  tau.hat$predictions - 1.96 * sigma.hat, 0, 2),
      xlab = "x", ylab = "tau", type = "l")
 lines(X.test[,1], tau.hat$predictions + 1.96 * sigma.hat, col = 1, lty = 2)
 lines(X.test[,1], tau.hat$predictions - 1.96 * sigma.hat, col = 1, lty = 2)
