@@ -40,7 +40,7 @@ X.test[,1]   <-   seq(-2, 2, length.out = 101)
 W   <-   rbinom(n, 1, 0.5)
 Y   <-   pmax(X[,1], 0) * W + X[,2] + pmin(X[,3], 0) + rnorm(n)
 
-tau.forest   <-   causal_forest(X, Y, W)
+tau.forest   <-   causal_forest(X, Y, W, num.trees = 1000)
 tau.hat      <-   predict(tau.forest, X.test)
 plot(x = X.test[,1],
      y = tau.hat$predictions,
