@@ -14,7 +14,7 @@ This fork of the grf package is used for didatic purposes and will not be up to 
 
 ### Installation
 
-To install the package run the following commands :
+To install the package run the following command:
 
 ```R
 install.packages("https://raw.github.com/walterwzhang/grf/master/releases/grf_0.9.5.tar.gz",
