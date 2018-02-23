@@ -63,7 +63,7 @@
 causal_forest <- function(X, Y, W, sample.fraction = 0.5, mtry = NULL,
                           num.trees = 2000, num.threads = NULL, min.node.size = NULL,
                           honesty = TRUE, ci.group.size = 2, precompute.nuisance = TRUE,
-                          alpha = 0.05, lambda = 0.0, downweight.penalty = FALSE, seed = NULL) {
+                          alpha = 0.05, lambda = 0.0, downweight.penalty = FALSE, seed = NULL, verbose = FALSE) {
 
     validate_X(X)
     if(length(Y) != nrow(X)) { stop("Y has incorrect length.") }
@@ -81,20 +81,20 @@ causal_forest <- function(X, Y, W, sample.fraction = 0.5, mtry = NULL,
 
     split.regularization <- 0
 
-    print("Pre-Comp Done")
+    if (verbose) print("Pre-Computations Done")
     if (!precompute.nuisance) {
         data <- create_data_matrices(X, Y, W)
         Y.hat <- NULL
         W.hat <- NULL
     } else {
-        print("forest.Y Done")
+        if (verbose) print("forest.Y Done")
         forest.Y <- regression_forest(X, Y, sample.fraction = sample.fraction, mtry = mtry,
                                       num.trees = min(500, num.trees), num.threads = num.threads, min.node.size = NULL,
                                       honesty = TRUE, seed = seed, ci.group.size = 1, alpha = alpha, lambda = lambda,
                                       downweight.penalty = downweight.penalty)
         Y.hat <- predict(forest.Y)$predictions
 
-        print("forest.W Done")
+        if (verbose) print("forest.W Done")
         forest.W <- regression_forest(X, W, sample.fraction = sample.fraction, mtry = mtry,
                                       num.trees = min(500, num.trees), num.threads = num.threads, min.node.size = NULL,
                                       honesty = TRUE, seed = seed, ci.group.size = 1, alpha = alpha, lambda = lambda,
@@ -104,20 +104,20 @@ causal_forest <- function(X, Y, W, sample.fraction = 0.5, mtry = NULL,
 
         data <- create_data_matrices(X, Y - Y.hat, W - W.hat)
     }
-    print("Both Forest Done")
+    if (verbose) print("Both Forest Done")
 
     variable.names <- c(colnames(X), "outcome", "treatment")
     outcome.index <- ncol(X) + 1
     treatment.index <- ncol(X) + 2
     instrument.index <- treatment.index
 
-    print("instrumental_train begin")
+    if (verbose) print("instrumental_train begin")
     forest <- instrumental_train(data$default, data$sparse, outcome.index, treatment.index, instrument.index,
         variable.names, mtry, num.trees, verbose, num.threads, min.node.size,
         sample.with.replacement, keep.inbag, sample.fraction, seed, honesty,
         ci.group.size, split.regularization, alpha, lambda, downweight.penalty)
 
-    print("instrumental_train done")
+    if (verbose) print("instrumental_train done")
 
     forest[["ci.group.size"]] <- ci.group.size
     forest[["X.orig"]] <- X
@@ -126,7 +126,7 @@ causal_forest <- function(X, Y, W, sample.fraction = 0.5, mtry = NULL,
     forest[["Y.hat"]] <- Y.hat
     forest[["W.hat"]] <- W.hat
 
-    print("Forest List adding done")
+    if (verbose) print("Forest List creation complete")
 
     class(forest) <- c("causal_forest", "grf")
     forest
